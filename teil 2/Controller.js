@@ -1,4 +1,5 @@
 import { canvasNorm, ctx } from "./canvas.js";
+import { scale, sub, normalize, limit } from "./math.js";
 import { mouse } from "./mouse.js";
 
 export class Controller {
@@ -7,6 +8,7 @@ export class Controller {
         this.vector = { x: 0, y: 0 };
         this.addControl();
         this.active = true;
+        this.maxLength = 300;
     }
 
     addControl() {
@@ -14,16 +16,15 @@ export class Controller {
             if (!this.active) return;
             this.active = false;
             const factor = 0.15;
-            this.ball.vel.x = factor * this.vector.x;
-            this.ball.vel.y = factor * this.vector.y;
+            this.ball.vel = scale(factor, this.vector);
         });
     }
 
     update() {
-        this.vector = {
-            x: mouse.x - this.ball.pos.x,
-            y: mouse.y - this.ball.pos.y,
-        };
+        this.vector = limit(
+            this.maxLength,
+            sub(mouse, this.ball.pos)
+        );
     }
 
     draw() {
@@ -33,25 +34,18 @@ export class Controller {
         ctx.lineWidth = 10;
         ctx.lineCap = "round";
         ctx.strokeStyle = "rgba(255,255,255,0.5)";
+        ctx.translate(this.ball.pos.x, this.ball.pos.y);
         ctx.beginPath();
-        ctx.moveTo(this.ball.pos.x, this.ball.pos.y);
-        ctx.lineTo(mouse.x, mouse.y);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(this.vector.x, this.vector.y);
         ctx.stroke();
         ctx.closePath();
         // thin line
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(this.ball.pos.x, this.ball.pos.y);
-        const vectorLength = Math.sqrt(
-            this.vector.x * this.vector.x +
-                this.vector.y * this.vector.y
-        );
-        ctx.lineTo(
-            this.ball.pos.x +
-                (canvasNorm / vectorLength) * this.vector.x,
-            this.ball.pos.y +
-                (canvasNorm / vectorLength) * this.vector.y
-        );
+        ctx.moveTo(0, 0);
+        const targetFar = scale(canvasNorm, normalize(this.vector));
+        ctx.lineTo(targetFar.x, targetFar.y);
         ctx.stroke();
         ctx.restore();
     }

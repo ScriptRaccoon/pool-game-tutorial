@@ -16,7 +16,7 @@ function loop() {
     clearCanvas();
     drawCloth();
     drawWood();
-    balls.forEach((b) => b.update());
+    balls.forEach((b) => b.update(balls));
     balls.forEach((b) => b.draw());
     controller.update();
     controller.draw();
