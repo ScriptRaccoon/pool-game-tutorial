@@ -1,27 +1,24 @@
-import { Ball } from "./Ball.js";
 import { clearCanvas } from "./canvas.js";
-import { Controller } from "./Controller.js";
-import { mouse } from "./mouse.js";
-import { balls, whiteBall } from "./setupBalls.js";
-import { drawCloth, drawWood } from "./table.js";
+import { openDialog } from "./dialog.js";
+import { Game } from "./Game.js";
+import { balls } from "./setupBalls.js";
+import { pockets } from "./setupPockets.js";
 
-const controller = new Controller(whiteBall);
-
-drawCloth();
-drawWood();
-
-balls.forEach((ball) => ball.draw());
+const game = new Game({ balls, pockets });
 
 function loop() {
     clearCanvas();
-    drawCloth();
-    drawWood();
-    balls.forEach((b) => b.update(balls));
-    balls.forEach((b) => b.draw());
-    controller.update();
-    controller.draw();
-    controller.active = balls.every((b) => b.idle);
+    game.update();
+    game.draw();
     requestAnimationFrame(loop);
 }
 
 loop();
+
+setTimeout(() => {
+    openDialog(
+        "Use your mouse to control the white ball.<br>" +
+            "Try to pocket every other ball with it.<br>" +
+            "The black ball has to be the last one."
+    );
+}, 500);

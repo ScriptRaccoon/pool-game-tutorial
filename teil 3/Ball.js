@@ -4,10 +4,13 @@ import { add, sub, scale, dotProduct, distance } from "./math.js";
 export class Ball {
     constructor({ pos, color, vel }) {
         this.pos = pos;
+        this.originalPos = { ...this.pos };
         this.color = color;
         this.vel = vel ?? { x: 0, y: 0 };
+        this.originalVel = { ...this.vel };
         this.size = 18;
         this.friction = 0.99;
+        this.inPocket = false;
     }
 
     get idle() {
@@ -15,6 +18,7 @@ export class Ball {
     }
 
     draw() {
+        if (this.inPocket) return;
         ctx.beginPath();
         ctx.fillStyle = this.color;
         ctx.arc(this.pos.x, this.pos.y, this.size, 0, 2 * Math.PI);
@@ -22,14 +26,16 @@ export class Ball {
         ctx.closePath();
     }
 
-    update(balls) {
+    update(game) {
         this.pos.x += this.vel.x;
         this.pos.y += this.vel.y;
         this.vel.x *= this.friction;
         this.vel.y *= this.friction;
-        this.bounceOfWalls();
-        this.collideWithBalls(balls);
         this.handleTinyVelocities();
+        if (this.inPocket) return;
+        this.bounceOfWalls();
+        this.checkPockets(game.pockets);
+        this.collideWithBalls(game.balls);
     }
 
     bounceOfWalls() {
@@ -64,7 +70,7 @@ export class Ball {
 
     collideWithBalls(balls) {
         balls.forEach((ball) => {
-            if (this == ball) return;
+            if (this == ball || ball.inPocket) return;
             const dist = distance(this.pos, ball.pos);
             // check for collision
             if (dist > this.size + ball.size) return;
@@ -83,5 +89,40 @@ export class Ball {
             this.vel = sub(this.vel, w);
             ball.vel = add(ball.vel, w);
         });
+    }
+
+    checkPockets(pockets) {
+        pockets.forEach((pocket) => {
+            if (pocket.includes(this)) {
+                this.inPocket = true;
+                return;
+            }
+        });
+    }
+
+    reset(game) {
+        this.inPocket = false;
+        this.pos = { ...this.originalPos };
+        this.vel = { ...this.originalVel };
+        if (this == game.whiteBall) {
+            this.avoidOtherBalls(game.balls);
+        }
+    }
+
+    intersects(ball) {
+        return distance(this.pos, ball.pos) <= this.size + ball.size;
+    }
+
+    avoidOtherBalls(balls) {
+        const delta = 4;
+        while (
+            balls.some(
+                (ball) => ball != this && this.intersects(ball)
+            )
+        ) {
+            const coord = Math.random() < 0.5 ? "x" : "y";
+            const sign = Math.random() < 0.5 ? +1 : -1;
+            this.pos[coord] += delta * sign;
+        }
     }
 }

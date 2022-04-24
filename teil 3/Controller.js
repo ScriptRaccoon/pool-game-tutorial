@@ -13,7 +13,7 @@ export class Controller {
 
     addControl() {
         document.addEventListener("click", (e) => {
-            if (!this.active) return;
+            if (e.target.nodeName == "BUTTON" || !this.active) return;
             this.active = false;
             const factor = 0.15;
             this.ball.vel = scale(factor, this.vector);
