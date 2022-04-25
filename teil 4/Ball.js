@@ -1,5 +1,13 @@
 import { ctx, margin, canvas } from "./canvas.js";
-import { add, sub, scale, dotProduct, distance } from "./math.js";
+import {
+    add,
+    sub,
+    scale,
+    dotProduct,
+    distance,
+    angleBetween,
+    rotate,
+} from "./math.js";
 
 export class Ball {
     constructor({ pos, color, vel }) {
@@ -34,6 +42,7 @@ export class Ball {
         this.handleTinyVelocities();
         if (this.inPocket) return;
         this.bounceOfWalls();
+        this.bounceOfBumpers(game.bumpers);
         this.checkPockets(game.pockets);
         this.collideWithBalls(game.balls);
     }
@@ -124,5 +133,17 @@ export class Ball {
             const sign = Math.random() < 0.5 ? +1 : -1;
             this.pos[coord] += delta * sign;
         }
+    }
+
+    bounceOfBumpers(bumpers) {
+        bumpers.forEach((bumper) => {
+            const segment = bumper.intersectionSegment(this);
+            if (segment != null) {
+                const [a, b] = segment;
+                const vector = sub(b, a);
+                const angle = angleBetween(this.vel, vector);
+                this.vel = rotate(2 * angle, this.vel);
+            }
+        });
     }
 }

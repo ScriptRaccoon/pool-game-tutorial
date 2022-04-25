@@ -1,10 +1,12 @@
 import { ctx } from "./canvas.js";
 import { distance } from "./math.js";
 
+export const pocketSize = 30;
+
 export class Pocket {
     constructor({ pos }) {
         this.pos = pos;
-        this.size = 30;
+        this.size = pocketSize;
         this.color = "#000";
     }
 

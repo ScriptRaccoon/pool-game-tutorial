@@ -1,10 +1,6 @@
 import { clearCanvas } from "./canvas.js";
 import { openDialog } from "./dialog.js";
-import { Game } from "./Game.js";
-import { balls } from "./setupBalls.js";
-import { pockets } from "./setupPockets.js";
-
-const game = new Game({ balls, pockets });
+import { game } from "./setupGame.js";
 
 function loop() {
     clearCanvas();

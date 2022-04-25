@@ -4,9 +4,10 @@ import { COLORS } from "./setupBalls.js";
 import { drawCloth, drawWood } from "./table.js";
 
 export class Game {
-    constructor({ balls, pockets }) {
+    constructor({ balls, pockets, bumpers }) {
         this.balls = balls;
         this.pockets = pockets;
+        this.bumpers = bumpers;
         this.won = null;
         this.playing = true;
         this.idle = true;
@@ -32,6 +33,7 @@ export class Game {
         drawCloth();
         drawWood();
         this.pockets.forEach((p) => p.draw());
+        this.bumpers.forEach((b) => b.draw());
         this.balls.forEach((b) => b.draw());
         this.controller.draw();
     }
@@ -39,10 +41,10 @@ export class Game {
     update() {
         if (!this.playing) return;
         this.balls.forEach((b) => b.update(this));
-        this.controller.update();
         this.idle = this.balls.every((b) => b.idle || b.inPocket);
         if (this.idle) {
             this.controller.active = true;
+            this.controller.update();
             if (this.blackBall.inPocket) {
                 this.finish();
             } else if (this.whiteBall.inPocket) {
