@@ -1,6 +1,7 @@
 import { canvasNorm, ctx } from "./canvas.js";
-import { scale, sub, normalize, limit } from "./math.js";
+import { scale, sub, normalize, limit, norm } from "./math.js";
 import { mouse } from "./mouse.js";
+import { SOUND } from "./sound.js";
 
 export class Controller {
     constructor(ball) {
@@ -17,6 +18,13 @@ export class Controller {
             this.active = false;
             const factor = 0.15;
             this.ball.vel = scale(factor, this.vector);
+            const speed = norm(this.ball.vel);
+            const volume = Math.min(
+                1,
+                speed / (factor * this.maxLength)
+            );
+            SOUND.CUE.volume = volume;
+            SOUND.CUE.play();
         });
     }
 

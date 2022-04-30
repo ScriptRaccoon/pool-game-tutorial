@@ -7,7 +7,9 @@ import {
     distance,
     angleBetween,
     rotate,
+    norm,
 } from "./math.js";
+import { SOUND } from "./sound.js";
 
 export class Ball {
     constructor({ pos, color, vel }) {
@@ -19,6 +21,19 @@ export class Ball {
         this.size = 18;
         this.friction = 0.99;
         this.inPocket = false;
+        this.gradient = ctx.createRadialGradient(
+            -0.4 * this.size,
+            -0.4 * this.size,
+            1,
+            0,
+            0,
+            this.size
+        );
+        this.gradient.addColorStop(0, "rgba(255,255,255,0.25)");
+        this.gradient.addColorStop(0.4, "rgba(255,255,255,0)");
+        this.gradient.addColorStop(0.7, "rgba(0,0,0,0)");
+        this.gradient.addColorStop(1, "rgba(0,0,0,0.3)");
+        this.alpha = 1;
     }
 
     get idle() {
@@ -26,12 +41,49 @@ export class Ball {
     }
 
     draw() {
-        if (this.inPocket) return;
+        // pocket animation
+        if (this.alpha == 0) return;
+        if (this.inPocket) {
+            this.alpha = Math.max(0, this.alpha - 0.2);
+        }
+        // prepare drawing
+        const shadowFactor = {
+            x: ((this.pos.x - canvas.width / 2) / canvas.width) * 0.5,
+            y: 0.15,
+        };
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.translate(this.pos.x, this.pos.y);
+
+        // draw shadow
         ctx.beginPath();
-        ctx.fillStyle = this.color;
-        ctx.arc(this.pos.x, this.pos.y, this.size, 0, 2 * Math.PI);
+        ctx.arc(
+            shadowFactor.x * this.size,
+            shadowFactor.y * this.size,
+            this.size,
+            0,
+            2 * Math.PI
+        );
+        ctx.fillStyle = "rgba(0,0,0,0.15)";
         ctx.fill();
         ctx.closePath();
+
+        // alternative shadow:
+        // ctx.shadowBlur = 3;
+        // ctx.shadowColor = "rgba(0,0,0,0.15)";
+        // ctx.shadowOffsetX = 5;
+        // ctx.shadowOffsetY = 2;
+
+        // draw regular ball
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size, 0, 2 * Math.PI);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        // draw light effects
+        ctx.fillStyle = this.gradient;
+        ctx.fill();
+        ctx.closePath();
+        ctx.restore();
     }
 
     update(game) {
@@ -41,13 +93,13 @@ export class Ball {
         this.vel.y *= this.friction;
         this.handleTinyVelocities();
         if (this.inPocket) return;
-        this.bounceOfWalls();
-        this.bounceOfBumpers(game.bumpers);
+        this.bounceOffWalls();
+        this.bounceOffBumpers(game.bumpers);
         this.checkPockets(game.pockets);
         this.collideWithBalls(game.balls);
     }
 
-    bounceOfWalls() {
+    bounceOffWalls() {
         // horizontal
         if (this.pos.x + this.size >= canvas.width - margin) {
             this.pos.x = canvas.width - margin - this.size;
@@ -97,6 +149,13 @@ export class Ball {
             );
             this.vel = sub(this.vel, w);
             ball.vel = add(ball.vel, w);
+            // play sound
+            const volume = Math.min(
+                1,
+                (norm(this.vel) + norm(ball.vel)) / 15
+            );
+            SOUND.COLLISION.volume = volume;
+            SOUND.COLLISION.play();
         });
     }
 
@@ -104,6 +163,7 @@ export class Ball {
         pockets.forEach((pocket) => {
             if (pocket.includes(this)) {
                 this.inPocket = true;
+                SOUND.POCKET.play();
                 return;
             }
         });
@@ -111,6 +171,7 @@ export class Ball {
 
     reset(game) {
         this.inPocket = false;
+        this.alpha = 1;
         this.pos = { ...this.originalPos };
         this.vel = { ...this.originalVel };
         if (this == game.whiteBall) {
@@ -135,7 +196,7 @@ export class Ball {
         }
     }
 
-    bounceOfBumpers(bumpers) {
+    bounceOffBumpers(bumpers) {
         bumpers.forEach((bumper) => {
             const segment = bumper.intersectionSegment(this);
             if (segment != null) {
@@ -143,6 +204,10 @@ export class Ball {
                 const vector = sub(b, a);
                 const angle = angleBetween(this.vel, vector);
                 this.vel = rotate(2 * angle, this.vel);
+                // play sound
+                const volume = Math.min(1, norm(this.vel) / 30);
+                SOUND.BUMPER.volume = volume;
+                SOUND.BUMPER.play();
             }
         });
     }

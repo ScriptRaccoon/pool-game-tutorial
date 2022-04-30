@@ -8,8 +8,12 @@ export function openDialog(txt) {
 }
 
 export function closeDialog() {
-    dialogElement.open = false;
-    dialogContent.innerHTML = "";
+    dialogElement.classList.add("close");
+    setTimeout(() => {
+        dialogElement.classList.remove("close");
+        dialogElement.open = false;
+        dialogContent.innerHTML = "";
+    }, 300);
 }
 
 closeBtn.addEventListener("click", closeDialog);

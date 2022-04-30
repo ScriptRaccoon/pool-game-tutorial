@@ -1,6 +1,7 @@
 import { Controller } from "./Controller.js";
 import { openDialog, closeDialog } from "./dialog.js";
 import { COLORS } from "./setupBalls.js";
+import { SOUND } from "./sound.js";
 import { drawCloth, drawWood } from "./table.js";
 
 export class Game {
@@ -30,12 +31,16 @@ export class Game {
     }
 
     draw() {
+        this.balls.forEach((b) => b.draw());
+        this.controller.draw();
+    }
+
+    drawTable() {
         drawCloth();
         drawWood();
         this.pockets.forEach((p) => p.draw());
         this.bumpers.forEach((b) => b.draw());
-        this.balls.forEach((b) => b.draw());
-        this.controller.draw();
+        this.pockets.forEach((p) => p.drawMounting());
     }
 
     update() {
@@ -48,6 +53,7 @@ export class Game {
             if (this.blackBall.inPocket) {
                 this.finish();
             } else if (this.whiteBall.inPocket) {
+                SOUND.WHIP.play();
                 this.whiteBall.reset(this);
             }
         }
@@ -62,13 +68,16 @@ export class Game {
                 (ball) => ball == this.whiteBall || ball.inPocket
             );
         if (this.won) {
+            SOUND.WIN.play();
             openDialog("You won!");
         } else {
+            SOUND.LOSE.play();
             openDialog("You lost!");
         }
     }
 
     restart() {
+        SOUND.WHIP.play();
         closeDialog();
         this.balls.forEach((b) => b.reset(this));
         this.won = null;

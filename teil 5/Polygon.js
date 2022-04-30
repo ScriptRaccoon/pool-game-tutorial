@@ -1,4 +1,4 @@
-import { ctx } from "./canvas.js";
+import { tctx } from "./canvas.js";
 import { segmentIntersectsCircle } from "./math.js";
 
 export class Polygon {
@@ -8,14 +8,14 @@ export class Polygon {
     }
 
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.moveTo(this.coords[0].x, this.coords[0].y);
+        tctx.fillStyle = this.color;
+        tctx.beginPath();
+        tctx.moveTo(this.coords[0].x, this.coords[0].y);
         for (let i = 1; i < this.coords.length; i++) {
-            ctx.lineTo(this.coords[i].x, this.coords[i].y);
+            tctx.lineTo(this.coords[i].x, this.coords[i].y);
         }
-        ctx.fill();
-        ctx.closePath();
+        tctx.fill();
+        tctx.closePath();
     }
 
     // gets the segment which intersects a circle
