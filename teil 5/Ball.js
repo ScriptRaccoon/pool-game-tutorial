@@ -68,17 +68,12 @@ export class Ball {
         ctx.fill();
         ctx.closePath();
 
-        // alternative shadow:
-        // ctx.shadowBlur = 3;
-        // ctx.shadowColor = "rgba(0,0,0,0.15)";
-        // ctx.shadowOffsetX = 5;
-        // ctx.shadowOffsetY = 2;
-
         // draw regular ball
         ctx.beginPath();
         ctx.arc(0, 0, this.size, 0, 2 * Math.PI);
         ctx.fillStyle = this.color;
         ctx.fill();
+
         // draw light effects
         ctx.fillStyle = this.gradient;
         ctx.fill();

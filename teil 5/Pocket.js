@@ -10,7 +10,6 @@ export class Pocket {
         this.type = type;
         this.rotation = rotation;
         this.size = pocketSize;
-        this.color = "#000";
         this.gradient = tctx.createRadialGradient(
             0,
             0,
