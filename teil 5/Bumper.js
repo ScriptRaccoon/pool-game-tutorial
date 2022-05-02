@@ -5,7 +5,7 @@ export class Bumper extends Polygon {
     constructor({ coords, shadow }) {
         super({ coords });
         this.color = "rgb(0,90,15)";
-        this.shadow = shadow || { x: 5, y: 5 };
+        this.shadow = shadow || { x: 0, y: 0 };
         this.shadowColor = "rgba(0,0,0,0.45)";
     }
 
@@ -27,6 +27,7 @@ export class Bumper extends Polygon {
         tctx.fill();
         tctx.closePath();
         tctx.filter = "blur(0px)";
+        // draw shape
         super.draw();
     }
 }

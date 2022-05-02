@@ -45,6 +45,7 @@ export class Pocket {
         tctx.shadowColor = "rgba(255,200,0,0.25)";
         tctx.translate(this.pos.x, this.pos.y);
         tctx.rotate(this.rotation * (Math.PI / 180));
+
         if (this.type == "corner") {
             const overflow = 60;
             const d = 0.16;

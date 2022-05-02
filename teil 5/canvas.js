@@ -8,8 +8,10 @@ export const ctx = canvas.getContext("2d");
 export const tableCanvas = document.getElementById("tableCanvas");
 export const tctx = tableCanvas.getContext("2d");
 
+// wood margin
 export const margin = 60;
 
+// set up dimensions
 canvas.width = tableCanvas.width = 1200 + 2 * margin;
 canvas.height = tableCanvas.height = 600 + 2 * margin;
 

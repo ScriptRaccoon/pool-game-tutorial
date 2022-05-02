@@ -55,6 +55,7 @@ export class Controller {
         const targetFar = scale(canvasNorm, normalize(this.vector));
         ctx.lineTo(targetFar.x, targetFar.y);
         ctx.stroke();
+        ctx.closePath();
         ctx.restore();
     }
 }

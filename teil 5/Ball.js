@@ -21,6 +21,7 @@ export class Ball {
         this.size = 18;
         this.friction = 0.99;
         this.inPocket = false;
+        // gradient for light effects
         this.gradient = ctx.createRadialGradient(
             -0.4 * this.size,
             -0.4 * this.size,
@@ -195,6 +196,7 @@ export class Ball {
         bumpers.forEach((bumper) => {
             const segment = bumper.intersectionSegment(this);
             if (segment != null) {
+                // bouncing
                 const [a, b] = segment;
                 const vector = sub(b, a);
                 const angle = angleBetween(this.vel, vector);

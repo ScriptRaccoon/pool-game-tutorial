@@ -18,13 +18,13 @@ export class Polygon {
         tctx.closePath();
     }
 
-    // gets the segment which intersects a circle
-    intersectionSegment(circle) {
+    // gets the segment which intersects a ball
+    intersectionSegment(ball) {
         for (let i = 0; i < this.coords.length - 1; i++) {
             const a = this.coords[i];
             const b = this.coords[i + 1];
-            const c = circle.pos;
-            const r = circle.size;
+            const c = ball.pos;
+            const r = ball.size;
             if (segmentIntersectsCircle([a, b], [c, r])) {
                 return [a, b];
             }
